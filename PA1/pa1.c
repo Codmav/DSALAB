@@ -228,6 +228,8 @@ int hi = num_records -1;
 void sort_records_quick()
 {
   if (lo >= hi) {
+    lo = 0;
+    hi = num_records -1;
     return;
 }
 
