@@ -133,11 +133,11 @@ int search_binary_location(char uid[MAX_LEN])
   }
   if (cmp_uid(record_arr[(h-l)/2], uid) ==0) {    
     struct record r = record_arr[(h-l)/2];
-    h = num_reocrds;
+    h = num_records;
     l =0;
     return (h-1)/2;
   }
-  else if (cmp_uid(record_arr[num_records/2], uid) ==-1) {
+  else if (cmp_uid(record_arr[(h-l)/2], uid) ==-1) {
     l = h/2+1;
     search_record_binary(char uid[MAX_LEN]);
   }
@@ -145,6 +145,7 @@ int search_binary_location(char uid[MAX_LEN])
     h /= 2;
     search_record_binary(char uid[MAX_LEN]);
   }
+  return 9;
 }    
 
 struct record search_record_binary(char uid[MAX_LEN])
@@ -156,11 +157,11 @@ struct record search_record_binary(char uid[MAX_LEN])
   }
   if (cmp_uid(record_arr[(h-l)/2], uid) ==0) {    
     struct record r = record_arr[(h-l)/2];
-    h = num_reocrds;
+    h = num_records;
     l =0;
     return r;
   }
-  else if (cmp_uid(record_arr[num_records/2], uid) ==-1) {
+  else if (cmp_uid(record_arr[(h-l)/2], uid) ==-1) {
     l = h/2+1;
     search_record_binary(char uid[MAX_LEN]);
   }
@@ -168,6 +169,7 @@ struct record search_record_binary(char uid[MAX_LEN])
     h /= 2;
     search_record_binary(char uid[MAX_LEN]);
   }
+  return dummy;
 }    
 // delete record correspondig to the uid
 // if the corresponding record doesn't exist
@@ -220,52 +222,181 @@ void delete_all_records()
   int i;
   for (i =0; i<max_capacity; i++) {
     free_memory(record_arr + i)
+  return;
 }
 int lo = 0;
 int hi = num_records -1;
 // sort the record array using quick sort
 // use cmp_record implementaion to compare two records
+
 void sort_records_quick()
-{
+{ 
   if (lo >= hi) {
     lo = 0;
     hi = num_records -1;
     return;
+  }
+  pivot = record_arr[lo];
+  int i=lo;
+  int j=hi;
+  int mid;
+  while (true) {
+    while(cmp_record(pivot, record_arr[j]) ==-1)) {
+      j-=1;
+    }
+    struct record r = record_arr[j];
+    record_arr[j] = pivot;
+    record_arr[i] = r;
+    while(cmp_record(pivot, record_arr[j])==1) {
+      i+=1;
+    }
+    if (i==j) {
+      mid = i;
+      break;
+    }
+    r = record_arr[i];
+    record_arr[i] = pivot;
+    record_arr[j]=r;    
+  }
+  int Hi = hi;
+  hi = i -1;
+  sort_records_quick();
+  hi = Hi;
+  lo = i +1;
+  sort_records_quick();
+  lo = 0;
+  hi = num_records -1;
+  return;
 }
-
 // sort the record_arr using merge sort
 // use cmp_record implementaion to compare two records
 void sort_records_merge()
 {
-  NOT_IMPLEMENTED;
-}
-
+  if (lo>=hi) {
+    lo =0;
+    hi = num_records -1;
+    return;
+  }
+  mid = (lo + hi)/2;
+  int Hi =hi;
+  hi = mid;
+  sort_records_merge();
+  hi =Hi;
+  int Lo = lo;
+  lo = mid +1;
+  sort_records_merge();
+  int i;
+  int j;
+  while(
 // sort the record_arr using selection sort
 // use cmp_record implementaion to compare two records
 void sort_records_selection()
 {
-  NOT_IMPLEMENTED;
+  if (lo>=hi) {
+    lo =0;
+    return;  
+  }
+  int i;
+  for (i=lo; i<=hi; i++) {
+      if (cmp_record(record_arr[i], record_arr[lo]) == -1) {
+        struct record r = record_arr[lo];
+        record_arr[lo] = record_arr[i];
+        record_arr[i] =r;
+      }
+  }
+  lo +=1;
+sort_records_selection();
 }
-
 // return the number of records corresponding to the input name
 // use linear search to obtain the results
 size_t get_num_records_with_name_linear(char name[MAX_LEN])
 {
-  NOT_IMPLEMENTED;
+  size_t num;
+  int i;
+  for (i=0; i<num_records; i++) {
+    if (strcmp(record_arr[i].name, name) == 0) {
+      num+=1;
+    }
+  return num;
 }
 
 // implement quick sort algorithm to sort the 
 // record_arr using name as key
 void rearrange_data()
 {
-  NOT_IMPLEMENTED;
+  
+  if (lo >= hi) {
+    lo = 0;
+    hi = num_records -1;
+    return;
+  }
+  pivot = record_arr[lo];
+  int i=lo;
+  int j=hi;
+  int mid;
+  while (true) {
+    while((strcmp(pivot.name, record_arr[j].name) <0)||(strcmp(pivot.name, record_arr[j].name) ==0)) {
+      j-=1;
+    }
+    struct record r = record_arr[j];
+    record_arr[j] = pivot;
+    record_arr[i] = r;
+    while(strcmp(pivot, record_arr[j])>0) {
+      i+=1;
+    }
+    if (i==j) {
+      mid = i;
+      break;
+    }
+    r = record_arr[i];
+    record_arr[i] = pivot;
+    record_arr[j]=r;    
+  }
+  int Hi = hi;
+  hi = i -1;
+  rearrange_data();
+  hi = Hi;
+  lo = i +1;
+  rearrange_data();
+  lo = 0;
+  hi = num_records -1;
+  return;
 }
-
 // return the number of records corresponding to the input name
 // use binary search to obtain the results
 // you can assume that the caller has sorted
 // data using name as key before making these queries
 size_t get_num_records_with_name_binary(char name[MAX_LEN])
-{
-  NOT_IMPLEMENTED;
+{ 
+  size_t num=0;
+  if (l==h) {
+    l =0;
+    h = num_records;
+    num = 0;
+    return num;
+  }
+  if (cmp_uid(record_arr[(h-l)/2], uid) ==0) {    
+    h = num_records;
+    l =0;
+    int i = (h-l)/2;
+    while (cmp_uid(record_arr[i], uid) ==0) {
+      i++;
+      num++;
+    }
+    i = ((h-l)/2)-1;
+    while (cmp_uid(record_arr[i], uid) ==0) {
+      i-=1;
+      num++;
+    }
+    return num;
+  }
+  else if (cmp_uid(record_arr[(h-l)/2], uid) ==-1) {
+    l = h/2+1;
+    search_record_binary(char uid[MAX_LEN]);
+  }
+  else {
+    h /= 2;
+    search_record_binary(char uid[MAX_LEN]);
+  return num;
+  }
 }
