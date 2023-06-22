@@ -63,7 +63,7 @@ static void free_memory(void *ptr)
 // record_arr
 size_t get_num_records()
 {
-  NOT_IMPLEMENTED;
+  return num_records;
 }
 
 // insert record r at the end of the record array
@@ -74,9 +74,33 @@ size_t get_num_records()
 // make record_arr point to the new buffer
 void insert_record(struct record r)
 {
-  NOT_IMPLEMENTED;
+  if (record_arr == NULL) {
+        record_arr = (struct record*)allocate_memory(32*sizeof(char) +sizeof(int));
+        max_capacity++;
+        num_records++;
+    }
+    else if (num_records == max_capacity) {
+        struct record* new_head = (struct record*)allocate_memory(2*array.capacity*sizeof(struct record*));
+        int i;
+        for (i=0; i<max_capacity; i++) {
+            new_head[i] = record_arr[i];
+            free_memory(record_arr + i);
+        }
+        new_head[i] = r;
+        array.capacity *= 2;
+        num_records+= 1; 
+        record_arr = new_head;
+    }
+    else {
+        record_arr[num_records] = r;
+        num_records +=1;
+    }
+    return;
 }
-
+struct record dummy;
+dummy.status = -1;
+dummy.name = "0";
+dummy.uid = "0";
 // return the record corresponding to the uid
 // use the linear search algorithm
 // you can also use cmp_uid routine defined earlier
@@ -84,19 +108,67 @@ void insert_record(struct record r)
 // return a dummy record with status == -1
 struct record search_record_linear(char uid[MAX_LEN])
 {
-  NOT_IMPLEMENTED;
+  int i = 0;
+  while (i<num_records) {
+    if (cmp_uid(record_arr[i].uid, uid)==0) {
+      return record_arr[i];
+    }
+    i++;
+  }
+  return dummy;
 }
-
 // return the record corresponding to the uid
 // use the binary search algorithm
 // you can assume that the record_arr is alaredy sorted
 // if none of the records contain the input uid
 // return a dummy record with status == -1
-struct record search_record_binary(char uid[MAX_LEN])
-{
-  NOT_IMPLEMENTED;
-}
+int l = 0;
+int h = num_records;
+int search_binary_location(char uid[MAX_LEN])
+{ 
+  if (l==h) {
+    l =0;
+    h = num_records;
+    return -1;
+  }
+  if (cmp_uid(record_arr[(h-l)/2], uid) ==0) {    
+    struct record r = record_arr[(h-l)/2];
+    h = num_reocrds;
+    l =0;
+    return (h-1)/2;
+  }
+  else if (cmp_uid(record_arr[num_records/2], uid) ==-1) {
+    l = h/2+1;
+    search_record_binary(char uid[MAX_LEN]);
+  }
+  else {
+    h /= 2;
+    search_record_binary(char uid[MAX_LEN]);
+  }
+}    
 
+struct record search_record_binary(char uid[MAX_LEN])
+{ 
+  if (l==h) {
+    l =0;
+    h = num_records;
+    return dummy;
+  }
+  if (cmp_uid(record_arr[(h-l)/2], uid) ==0) {    
+    struct record r = record_arr[(h-l)/2];
+    h = num_reocrds;
+    l =0;
+    return r;
+  }
+  else if (cmp_uid(record_arr[num_records/2], uid) ==-1) {
+    l = h/2+1;
+    search_record_binary(char uid[MAX_LEN]);
+  }
+  else {
+    h /= 2;
+    search_record_binary(char uid[MAX_LEN]);
+  }
+}    
 // delete record correspondig to the uid
 // if the corresponding record doesn't exist
 // return a dummy record with status == -1
@@ -110,23 +182,53 @@ struct record search_record_binary(char uid[MAX_LEN])
 // copy records from old array to the new
 // array, and delete the old array,
 // make record_arr point to the new array
+
 struct record delete_record(char uid[MAX_LEN])
 {
-  NOT_IMPLEMENTED;
+  int i = search_binary_location(uid);
+  if (i == -1) {
+    return dummy;
+  }
+  struct record r = record_arr[i];
+  if (num_records == max_capacity) {
+        record_arr[i] = record_arr[num_reocrds-1];
+        num_records-=1;
+    }
+  else if (max_capacity>= 4) {
+        record_arr[i] = record_arr[num_records-1];
+        num_records -= 1;
+        if (num_records = max_capacity/4) {
+            struct record* new_head = (struct record*)allocate_memory((max_capacity/2)*sizeof(struct record*));
+            int j =0;
+            for (j=0; j< max_capacity/4; j++) {
+                new_head[j] = record_arr[j];
+            }
+            for (j=0; j < max_capacity; j++) {
+                free_memory(record_arr + j);
+            }
+            record_arr = new_head;
+            max_capacity /= 2;
+        }
+    }
+   return r; 
 }
 
 // delete all records in the record_arr
 // free record_arr
 void delete_all_records()
 {
-  NOT_IMPLEMENTED;
+  int i;
+  for (i =0; i<max_capacity; i++) {
+    free_memory(record_arr + i)
 }
-
+int lo = 0;
+int hi = num_records -1;
 // sort the record array using quick sort
 // use cmp_record implementaion to compare two records
 void sort_records_quick()
 {
-  NOT_IMPLEMENTED;
+  if (lo >= hi) {
+    return;
 }
 
 // sort the record_arr using merge sort
