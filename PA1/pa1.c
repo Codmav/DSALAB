@@ -80,7 +80,7 @@ void insert_record(struct record r)
         num_records++;
     }
     else if (num_records == max_capacity) {
-        struct record* new_head = (struct record*)allocate_memory(2*array.capacity*sizeof(struct record*));
+        struct record* new_head = (struct record*)allocate_memory(2*array.capacity*sizeof(struct record));
         int i;
         for (i=0; i<max_capacity; i++) {
             new_head[i] = record_arr[i];
@@ -200,7 +200,7 @@ struct record delete_record(char uid[MAX_LEN])
         record_arr[i] = record_arr[num_records-1];
         num_records -= 1;
         if (num_records = max_capacity/4) {
-            struct record* new_head = (struct record*)allocate_memory((max_capacity/2)*sizeof(struct record*));
+            struct record* new_head = (struct record*)allocate_memory((max_capacity/2)*sizeof(struct record));
             int j =0;
             for (j=0; j< max_capacity/4; j++) {
                 new_head[j] = record_arr[j];
@@ -285,9 +285,30 @@ void sort_records_merge()
   int Lo = lo;
   lo = mid +1;
   sort_records_merge();
-  int i;
-  int j;
-  while(
+  int i=0;
+  int j = mid +1 -Lo;
+  int n =Lo;
+  struct record* copy_arr = (struct record*)allocate_memory((Hi - Lo+1)*sizeof(struct record));
+  int m;
+  for (m=0; m<=Hi-Lo; m+=1) {
+    copy_arr[m] = record_arr[m+Lo];
+  }
+  while ((i<=mid-Lo) && (j<=Hi-Lo)) {
+      if (cmp_record(record_arr[i], record_arr[j])== -1) {
+        i+=1;
+        n+=1
+      }
+      else {
+        record_arr[n] = copy_arr[j];
+        j+=1;
+        n+=1;
+      }
+  }
+  lo = 0;
+  hi = num_records -1;
+  return;
+}
+        
 // sort the record_arr using selection sort
 // use cmp_record implementaion to compare two records
 void sort_records_selection()
@@ -341,7 +362,7 @@ void rearrange_data()
     struct record r = record_arr[j];
     record_arr[j] = pivot;
     record_arr[i] = r;
-    while(strcmp(pivot, record_arr[j])>0) {
+    while(strcmp(pivot.name, record_arr[j].name)>0) {
       i+=1;
     }
     if (i==j) {
@@ -375,22 +396,22 @@ size_t get_num_records_with_name_binary(char name[MAX_LEN])
     num = 0;
     return num;
   }
-  if (cmp_uid(record_arr[(h-l)/2], uid) ==0) {    
+  if (strcmp(record_arr[(h-l)/2].name, name) ==0) {    
     h = num_records;
     l =0;
     int i = (h-l)/2;
-    while (cmp_uid(record_arr[i], uid) ==0) {
+    while (strcmp(record_arr[i].name, name) ==0) {
       i++;
       num++;
     }
     i = ((h-l)/2)-1;
-    while (cmp_uid(record_arr[i], uid) ==0) {
+    while (strcmp(record_arr[i].name, name) ==0) {
       i-=1;
       num++;
     }
     return num;
   }
-  else if (cmp_uid(record_arr[(h-l)/2], uid) ==-1) {
+  else if (strcmp(record_arr[(h-l)/2].name, name) < 0) {
     l = h/2+1;
     search_record_binary(char uid[MAX_LEN]);
   }
